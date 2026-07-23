@@ -139,6 +139,7 @@ class TestOutreachAutomator(unittest.TestCase):
         }
         with open(profile_path, "w") as f:
             json.dump(profile_data, f)
+        db.update_user_profile(1, profile_data, db_path=self.test_db)
             
         try:
             res_tpl = db.add_manual_contacts(

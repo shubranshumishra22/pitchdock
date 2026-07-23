@@ -358,7 +358,7 @@ export default function LandingPage() {
         </div>
       </section>
 
-      {/* Telegram Mobile Agent Showcase (Premium Feature) */}
+      {/* Telegram Mobile Agent Showcase (Included for All Tiers) */}
       <section id="telegram" className="telegram-section">
         <div className="wrap">
           <div className="telegram-grid">
@@ -370,7 +370,7 @@ export default function LandingPage() {
                   <div className="telegram-bot-name">PitchDock Agent</div>
                   <div className="telegram-bot-status">● online · AI Outreach Copilot</div>
                 </div>
-                <span className="premium-tag">PREMIUM</span>
+                <span className="premium-tag" style={{ background: "rgba(139, 92, 246, 0.2)", color: "#a78bfa" }}>FREE &amp; ALL PLANS</span>
               </div>
               <div className="telegram-chat-messages">
                 <div className="telegram-msg user">
@@ -414,10 +414,10 @@ export default function LandingPage() {
 
             {/* Right Column: Copy & Benefits */}
             <div className="telegram-info">
-              <span className="feature-tag highlight">📱 PREMIUM FEATURE</span>
+              <span className="feature-tag highlight">📱 INCLUDED IN ALL PLANS</span>
               <h2>Control your entire job outreach directly from Telegram.</h2>
               <p className="subtext">
-                Never lose momentum in your job search. With PitchDock&apos;s Telegram Mobile Agent, your personal AI outreach manager lives right in your pocket. Pair your account with a single click and execute campaigns anywhere.
+                Never lose momentum in your job search. PitchDock&apos;s Telegram Mobile Agent is included for all users across all subscription tiers (including Free Starter). Your personal AI outreach manager lives right in your pocket. Pair your account with a single click and execute campaigns anywhere.
               </p>
               <div className="telegram-features-list">
                 <div className="t-feat">
@@ -595,6 +595,7 @@ export default function LandingPage() {
                 <li className="offered">✓ AI tailored cold drafts (first 5)</li>
                 <li className="offered">✓ Daily send limit: 5 emails/day</li>
                 <li className="offered">✓ Target company category filter</li>
+                <li className="offered" style={{ color: "#8b5cf6", fontWeight: 600 }}>📱 Telegram Mobile Agent</li>
                 <li className="not-offered">✗ Custom SMTP server config</li>
                 <li className="not-offered">✗ Company specific HR search</li>
                 <li className="not-offered">✗ Resume achievements rewrite</li>
@@ -613,6 +614,7 @@ export default function LandingPage() {
                 <li className="offered">✓ Daily send limit: 20 emails/day</li>
                 <li className="offered">✓ Target company category filter</li>
                 <li className="offered">✓ Custom SMTP server config</li>
+                <li className="offered" style={{ color: "#8b5cf6", fontWeight: 600 }}>📱 Telegram Mobile Agent</li>
                 <li className="not-offered">✗ Company specific HR search</li>
                 <li className="not-offered">✗ Resume achievements rewrite</li>
               </ul>

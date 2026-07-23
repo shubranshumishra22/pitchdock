@@ -843,30 +843,14 @@ export default function Dashboard() {
 
                   <div className="filter-group" style={{ display: "flex", alignItems: "center", gap: "6px", margin: 0 }}>
                     <label htmlFor="company-search-filter" style={{ fontSize: "10px", fontFamily: "var(--font-mono)", textTransform: "uppercase", color: "var(--slate)", fontWeight: 700, letterSpacing: "0.05em" }}>Company</label>
-                    {["standard", "premium"].includes(billingInfo.plan_tier) ? (
-                      <input
-                        id="company-search-filter"
-                        type="text"
-                        placeholder="Search company..."
-                        value={searchQuery}
-                        onChange={(e) => handleSearchChange(e.target.value)}
-                        className="filter-control-input"
-                      />
-                    ) : (
-                      <div 
-                        onClick={() => setIsUpgradeModalOpen(true)}
-                        style={{ cursor: "pointer" }}
-                        title="Company search requires Standard or Premium Plan"
-                      >
-                        <input
-                          id="company-search-filter"
-                          type="text"
-                          placeholder="🔒 Company"
-                          disabled
-                          className="filter-control-input disabled"
-                        />
-                      </div>
-                    )}
+                    <input
+                      id="company-search-filter"
+                      type="text"
+                      placeholder="Search company..."
+                      value={searchQuery}
+                      onChange={(e) => handleSearchChange(e.target.value)}
+                      className="filter-control-input"
+                    />
                   </div>
                 </div>
               </div>
@@ -1247,7 +1231,7 @@ export default function Dashboard() {
 
               <div className="setting-row oauth-row">
                 <label>Telegram Mobile Agent</label>
-                <p className="oauth-desc">Pair Telegram after signing in here, then send commands like "status" or "send email" from your phone.</p>
+                <p className="oauth-desc">Included for all users (all subscriptions, including Free Starter). Pair Telegram after signing in here, then send commands like "status" or "send email" from your phone.</p>
                 <button type="button" onClick={handleGenerateTelegramLinkCode} className="oauth-link-btn">
                   Generate Telegram Link Code
                 </button>
