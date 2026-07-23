@@ -236,9 +236,25 @@ def run_background_sending(req: SendRequest, user_id: int):
     state = get_user_task_state(user_id)
     
     try:
-        profile = db.get_user_profile(user_id)
-        if not profile:
-            profile = generator.load_candidate_profile()
+        profile = db.get_user_profile(user_id) or {}
+        default_prof = generator.load_candidate_profile() if os.path.exists("candidate_profile.json") else {}
+        
+        # Merge missing profile fields with candidate profile defaults
+        for k, v in default_prof.items():
+            if not profile.get(k):
+                profile[k] = v
+
+        if not profile.get("full_name"):
+            profile["full_name"] = "Shubranshu Shekhar"
+        if not profile.get("experience_years"):
+            profile["experience_years"] = "3"
+        if not profile.get("current_designation"):
+            profile["current_designation"] = "Software Engineer"
+        if not profile.get("industry_domain"):
+            profile["industry_domain"] = "Backend Systems & Cloud Infrastructure"
+        if not profile.get("target_role"):
+            profile["target_role"] = "Senior Software Engineer"
+            
         billing = db.get_billing_info(user_id)
     except Exception as e:
         state["status"] = "failed"
@@ -249,10 +265,13 @@ def run_background_sending(req: SendRequest, user_id: int):
     if not resume_path or not os.path.exists(resume_path):
         if os.path.exists("resume.pdf"):
             resume_path = "resume.pdf"
+        elif os.path.exists("/home/ubuntu/emailAutomater/resume.pdf"):
+            resume_path = "/home/ubuntu/emailAutomater/resume.pdf"
         else:
             log_user_task_message(user_id, f"WARNING: Resume PDF not found at '{resume_path}'. Email will go without attachment.")
             resume_path = None
-    else:
+
+    if resume_path and os.path.exists(resume_path):
         log_user_task_message(user_id, f"✓ Resume attachment verified: {os.path.basename(resume_path)}")
 
     # Get approved contacts
