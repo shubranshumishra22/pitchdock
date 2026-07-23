@@ -25,23 +25,19 @@ def load_candidate_profile(profile_path="candidate_profile.json"):
     with open(profile_path, "r") as f:
         return json.load(f)
 
-def generate_email_draft(contact, profile, client=None):
+def generate_email_draft(contact, profile, client=None, jd_text=None):
     """
-    Generates a personalized email subject and body for a contact based on candidate profile.
+    Generates a personalized high-converting cold outreach email subject and body for a contact.
     """
     if client is None:
         client = get_gemini_client()
         
-    hr_name = contact.get("name", "HR Manager").strip()
+    hr_name = contact.get("name", "").strip() or "Hiring Team"
     hr_title = contact.get("title", "").strip()
     hr_company = contact.get("company", "").strip()
-    hr_category = contact.get("category", "").strip()
     
-    # Extract first name
-    first_name = hr_name.split()[0] if hr_name and hr_name.lower() != "hr manager" else "Hiring Team"
-    if first_name.lower() in ["mr.", "ms.", "dr.", "mrs."]:
-        parts = hr_name.split()
-        first_name = parts[1] if len(parts) > 1 else "Hiring Team"
+    if not jd_text:
+        jd_text = contact.get("jd_text", "")
 
     # Candidate profile data
     cand_name = profile.get("full_name", "")
@@ -50,70 +46,62 @@ def generate_email_draft(contact, profile, client=None):
     cand_designation = profile.get("current_designation", "")
     cand_exp = profile.get("experience_years", "")
     cand_domain = profile.get("industry_domain", "")
-    cand_role = profile.get("target_role", "")
-    cand_achievements = "\n".join([f"- {ach}" for ach in profile.get("achievements", [])])
+    cand_role = contact.get("target_role") or profile.get("target_role") or cand_designation or "Software Engineer"
+    
+    raw_achievements = profile.get("achievements", [])
+    if isinstance(raw_achievements, str):
+        try:
+            raw_achievements = json.loads(raw_achievements)
+        except Exception:
+            raw_achievements = [raw_achievements]
+
+    resume_data = {
+        "candidate_name": cand_name,
+        "current_designation": cand_designation,
+        "experience_years": cand_exp,
+        "industry_domain": cand_domain,
+        "target_role": cand_role,
+        "achievements": raw_achievements,
+        "phone": cand_phone,
+        "linkedin": cand_linkedin
+    }
 
     system_instruction = (
-        "You are an expert career advisor and professional writer specialized in cold emailing. "
-        "Your task is to write a highly professional, polite, and personalized cold outreach email. "
-        "You must generate a structured JSON object containing 'subject' and 'body'. "
-        "Do not include markdown tags like ```json or similar in the text values, just raw plain text. "
-        "Use newlines (\\n) for spacing in the body."
+        "You are an expert cold-outreach copywriter who has worked with technical recruiters at top companies. "
+        "Recruiters skim 200+ emails a day and decide to open/reply within 5-10 seconds. Your job is to write a "
+        "candidate outreach email that survives that skim.\n\n"
+        "RULES FOR THE EMAIL:\n\n"
+        "1. SUBJECT LINE (under 60 characters):\n"
+        "   - Lead with role + one standout signal (years of experience, a recognizable company, or a metric), not a generic phrase.\n"
+        "   - Bad: 'Exploring Software Engineer opportunities at Affle'\n"
+        "   - Good: '5 YOE SWE — interested in Affle's backend team'\n\n"
+        "2. OPENING LINE (no throat-clearing):\n"
+        "   - Never say 'I know you read hundreds of these' or any line about the recruiter's inbox — it wastes their first 3 seconds on nothing.\n"
+        "   - Open with who the candidate is + the single most relevant qualifier for THIS role, pulled directly from the resume.\n\n"
+        "3. BODY (max 2 bullet points, each ONE line if possible):\n"
+        "   - Every bullet must contain a number, scale, or named technology relevant to the JD — never generic phrases like 'robust, scalable solutions' or 'significantly reducing' without a number attached.\n"
+        "   - Pull bullets directly from resume_data. If jd_text is provided, prioritize the 1-2 resume achievements that most closely match the JD's stated requirements — mirror its keywords where truthful.\n"
+        "   - Never fabricate achievements. If resume data is missing or can't be parsed, explicitly flag this to the user instead of inventing accomplishments.\n\n"
+        "4. CLOSE:\n"
+        "   - One line, low-friction ask ('Open to a 10-min chat this week?' beats 'Happy to send more detail').\n"
+        "   - Sign with the candidate's real name, pulled from resume_data — never a placeholder like 'Jane Doe.'\n\n"
+        "5. LENGTH: Under 120 words total, excluding subject line. Recruiters reward brevity.\n\n"
+        "6. TONE: Confident, specific, zero fluff. Cut any sentence that could apply to literally any other candidate.\n\n"
+        "You must generate a structured JSON object containing 'subject' and 'body'. Do not include markdown tags like ```json or similar in the text values, just raw plain text."
     )
 
     prompt = f"""
-Candidate Details:
-- Name: {cand_name}
-- Phone: {cand_phone}
-- LinkedIn: {cand_linkedin}
-- Current Designation: {cand_designation}
-- Experience: {cand_exp} years
-- Industry/Domain: {cand_domain}
-- Target Role: {cand_role}
-- Profile Highlights/Achievements:
-{cand_achievements}
+INPUTS:
+- Candidate resume/parsed data: {json.dumps(resume_data, indent=2)}
+- Target role: {cand_role}
+- Target company: {hr_company or 'Tech Team'}
+- Recruiter name: {hr_name}
+- Job description (if provided): {jd_text or 'N/A'}
 
-Recipient HR Details:
-- Name: {hr_name} (First Name: {first_name})
-- Title: {hr_title}
-- Company: {hr_company}
-- Tier Category: {hr_category}
-
-Reference Template:
----
-Subject: [Write a professional, short, click-worthy subject line. Example: Application for [Target Role] or Discussion: [Target Role] at [Company]]
-
-Hi {first_name},
-
-Hope you’re doing well.
-
-I know you probably receive a lot of emails every day, so I’ll keep this brief.
-
-I’m currently working as a {cand_designation} with {cand_exp} years of experience in {cand_domain}, and I’m actively looking for opportunities as a {cand_role}.
-
-A quick snapshot of my profile:
-[Include 2 to 3 candidate achievements formatted as clean bullet points. Keep them impactful.]
-
-I’m reaching out in case there’s a suitable opening within your organization, either now or in the near future. If you feel my profile could be a good fit, I’d be grateful if you could consider my application.
-
-I’ve attached my resume for your reference.
-
-Thank you for your time. I truly appreciate it, and I hope to hear from you if there’s an opportunity that matches my background.
-
-Best Regards,
-{cand_name}
-{cand_phone}
-{cand_linkedin}
----
-
-Instructions:
-1. Generate the 'subject' and 'body' of the email.
-2. In the body, replace bracketed placeholders with the candidate's actual values.
-3. Keep the bulleted achievements clean and readable. Use a bullet character like '•' or '-'.
-4. Ensure the tone is polite and professional.
-5. In the email subject, customize it for the target role and company (e.g., "Exploring Senior Software Engineer opportunities at {hr_company}").
-6. If the company or title is empty or generic, write a general but professional subject.
-7. Return only the JSON object matching the requested schema.
+OUTPUT FORMAT:
+Generate a structured JSON matching schema with:
+- "subject": <subject line>
+- "body": <email body>
 """
 
     response = client.models.generate_content(
