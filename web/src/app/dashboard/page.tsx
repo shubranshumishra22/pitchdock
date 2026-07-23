@@ -164,9 +164,9 @@ export default function Dashboard() {
   const [telegramLinkInstructions, setTelegramLinkInstructions] = useState("");
 
   // Template states
-  const [templateSubject, setTemplateSubject] = useState("Exploring {role} opportunities at {company}");
+  const [templateSubject, setTemplateSubject] = useState("{experience} YOE {role} — interested in {company}'s tech team");
   const [templateBody, setTemplateBody] = useState(
-    "Hi {recruiter_name},\n\nI know recruiters read hundreds of these, so I'll keep it short. I'm a software engineer with {experience} years of experience, and I'd like to talk about the {role} role at {company}.\n\nTwo things that might be relevant to your team:\n— {achievement_1}\n— {achievement_2}\n\nRésumé is attached. Happy to send more detail on any of it.\n\nBest regards,\n{my_name}"
+    "Hi {recruiter_name},\n\nI'm a {role} with {experience} years of experience specializing in high-throughput backend services and cloud infrastructure.\n\nA few quick highlights from my work:\n• {achievement_1}\n• {achievement_2}\n\nOpen to a 10-min chat this week to see if my background aligns with {company}'s current needs?\n\nBest,\n{my_name}"
   );
 
   // Personalized draft state
@@ -181,10 +181,10 @@ export default function Dashboard() {
     text = text.replace(/{company_name}/g, rec.company || "Company");
     text = text.replace(/{role}/g, profile.target_role || "Software Engineer");
     text = text.replace(/{recruiter_role}/g, rec.title || "Technical Recruiter");
-    text = text.replace(/{experience}/g, profile.experience_years || "5");
-    text = text.replace(/{my_name}/g, profile.full_name || "Jane Doe");
-    text = text.replace(/{achievement_1}/g, profile.achievements[0] || "Led product components engineering");
-    text = text.replace(/{achievement_2}/g, profile.achievements[1] || "Automated delivery pipeline workflows");
+    text = text.replace(/{experience}/g, profile.experience_years || "3");
+    text = text.replace(/{my_name}/g, profile.full_name || "Shubranshu Shekhar");
+    text = text.replace(/{achievement_1}/g, profile.achievements[0] || "Engineered high-throughput microservices handling 10k+ req/sec, slashing API response latency by 40%.");
+    text = text.replace(/{achievement_2}/g, profile.achievements[1] || "Optimized PostgreSQL database query execution plans, boosting query performance by 65%.");
     return text;
   };
 
@@ -196,10 +196,10 @@ export default function Dashboard() {
     text = text.replace(/{company_name}/g, rec.company || "Company");
     text = text.replace(/{role}/g, profile.target_role || "Software Engineer");
     text = text.replace(/{recruiter_role}/g, rec.title || "Technical Recruiter");
-    text = text.replace(/{experience}/g, profile.experience_years || "5");
-    text = text.replace(/{my_name}/g, profile.full_name || "Jane Doe");
-    text = text.replace(/{achievement_1}/g, profile.achievements[0] || "Led product components engineering");
-    text = text.replace(/{achievement_2}/g, profile.achievements[1] || "Automated delivery pipeline workflows");
+    text = text.replace(/{experience}/g, profile.experience_years || "3");
+    text = text.replace(/{my_name}/g, profile.full_name || "Shubranshu Shekhar");
+    text = text.replace(/{achievement_1}/g, profile.achievements[0] || "Engineered high-throughput microservices handling 10k+ req/sec, slashing API response latency by 40%.");
+    text = text.replace(/{achievement_2}/g, profile.achievements[1] || "Optimized PostgreSQL database query execution plans, boosting query performance by 65%.");
     return text;
   };
 

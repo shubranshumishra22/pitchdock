@@ -273,13 +273,26 @@ def run_background_sending(req: SendRequest, user_id: int):
         log_user_task_message(user_id, f"[{state['current']}/{state['total']}] Sending to {contact['name']} ({contact['email']})...")
         
         try:
-            test_email = "shubranshugudsol@gmail.com"
-            log_user_task_message(user_id, f"  [REDIRECT] Routing email for {contact['name']} to test inbox {test_email}...")
+            subject = contact.get("personalized_subject")
+            body = contact.get("personalized_body")
+
+            # Check if subject/body is missing or contains old fallback template markers
+            if not subject or not body or "hundreds" in body.lower() or "spearheaded" in body.lower() or "{" in body:
+                log_user_task_message(user_id, f"  [AI GENERATE] Generating fresh cold email for {contact['name']} ({contact['company']})...")
+                try:
+                    client = generator.get_gemini_client()
+                    subject, body = generator.generate_email_draft(contact, profile, client)
+                    db.update_contact_draft(contact["id"], subject, body, status="approved", user_id=user_id)
+                except Exception as gen_err:
+                    log_user_task_message(user_id, f"  ⚠️ AI draft generation warning: {gen_err}")
+
+            target_email = contact["email"].strip()
+            log_user_task_message(user_id, f"  Outreach dispatch to recruiter: {contact['name']} <{target_email}>")
             
             success, err = sender.send_single_email(
-                to_email=test_email,
-                subject=contact["personalized_subject"],
-                body=contact["personalized_body"],
+                to_email=target_email,
+                subject=subject,
+                body=body,
                 user_id=user_id,
                 attachment_path=resume_path
             )
@@ -289,7 +302,7 @@ def run_background_sending(req: SendRequest, user_id: int):
                 db.update_contact_status(contact["id"], "sent", sent_at=sent_time, user_id=user_id)
                 db.increment_emails_sent(1, user_id=user_id)
                 state["success"] += 1
-                log_user_task_message(user_id, f"  ✓ Email sent to {contact['email']}")
+                log_user_task_message(user_id, f"  ✓ Email successfully sent to {target_email}")
             else:
                 db.update_contact_status(contact["id"], "failed", error_message=err, user_id=user_id)
                 state["failed"] += 1
