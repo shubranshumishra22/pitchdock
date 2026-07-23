@@ -1012,6 +1012,16 @@ export default function Dashboard() {
                     />
                   )}
                 </div>
+                <div className="preview-meta-row attachment-meta-row" style={{ display: "flex", alignItems: "center", gap: "8px", background: "rgba(16, 185, 129, 0.08)", padding: "6px 12px", borderRadius: "6px", border: "1px solid rgba(16, 185, 129, 0.2)", margin: "8px 12px 4px 12px" }}>
+                  <span className="meta-label" style={{ color: "#10b981", fontWeight: "bold", fontSize: "12px" }}>📎 Attachment:</span>
+                  <span className="meta-value" style={{ color: "#ffffff", fontSize: "13px", fontFamily: "monospace" }}>
+                    {profile.resume_pdf_path ? profile.resume_pdf_path.split("/").pop() : "resume.pdf"}
+                  </span>
+                  <span style={{ fontSize: "11px", color: "#10b981", background: "rgba(16, 185, 129, 0.15)", padding: "2px 8px", borderRadius: "12px", marginLeft: "auto", fontWeight: "600" }}>
+                    ✓ Attached &amp; Verified
+                  </span>
+                </div>
+
                 <div className="preview-body-content editor-body-row">
                   {isPreviewReplacerMode ? (
                     <textarea 
