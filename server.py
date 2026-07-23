@@ -246,9 +246,14 @@ def run_background_sending(req: SendRequest, user_id: int):
         return
 
     resume_path = profile.get("resume_pdf_path")
-    if resume_path and not os.path.exists(resume_path):
-        log_user_task_message(user_id, f"WARNING: Resume not found at {resume_path}. Mails will go without attachments.")
-        resume_path = None
+    if not resume_path or not os.path.exists(resume_path):
+        if os.path.exists("resume.pdf"):
+            resume_path = "resume.pdf"
+        else:
+            log_user_task_message(user_id, f"WARNING: Resume PDF not found at '{resume_path}'. Email will go without attachment.")
+            resume_path = None
+    else:
+        log_user_task_message(user_id, f"✓ Resume attachment verified: {os.path.basename(resume_path)}")
 
     # Get approved contacts
     contacts = db.get_contacts_by_status("approved", user_id=user_id, limit=req.limit)
